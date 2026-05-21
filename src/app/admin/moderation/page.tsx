@@ -49,7 +49,6 @@ export default function ModerationPage() {
         </div>
       ) : (
         <>
-          {/* GRID */}
 
           <div className="grid grid-cols-2 gap-6">
             {filteredListings.map(

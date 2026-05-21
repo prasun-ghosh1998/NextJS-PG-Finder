@@ -17,7 +17,7 @@ interface Props {
   owner: string;
   badge: string;
   danger: boolean;
-  status:string;
+  status?: "Pending" | "Approved" | "Rejected";
 
   action: (
     id: number,
