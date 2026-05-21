@@ -9,7 +9,6 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/inputs";
 import Image from "next/image";
 import DynamicInput from "../DynamicInput";
-import { PropertyPayload } from "@/typescript/type/property.type";
 import { PropertyInputFields } from "@/services/json/property.input";
 import { useState } from "react";
 import { usePropertyAdd } from "@/hooks/useProperty";
@@ -18,7 +17,38 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { productSchema } from "@/services/validation/property.validation";
 import { X } from "lucide-react";
 
-const ProperyDialog = ({ open, onClose }) => {
+interface Property {
+  id?: number;
+  title?: string;
+  location?: string;
+  price?: string;
+  image?: string;
+}
+
+interface PropertyDialogProps {
+  open: boolean;
+  onClose: () => void;
+  property?: Property | null;
+}
+
+export interface PropertyPayload {
+  title: string;
+  location: string;
+  price: string;
+  type: string;
+  amenities: string;
+
+  image?: File;
+
+  tag?: string;
+  action?: string;
+  status?: string;
+
+  badge?: string;
+  danger?: boolean;
+  name?: string;
+}
+const ProperyDialog = ({ open, onClose }:PropertyDialogProps) => {
   const [preview, setPreview] = useState<string | null>(null);
   const { isError, isPending, mutate } = usePropertyAdd();
 
@@ -53,6 +83,8 @@ const ProperyDialog = ({ open, onClose }) => {
     }
    });
   };
+
+ 
 
   return (
    <Dialog open={open} onOpenChange={onClose}>
@@ -149,10 +181,13 @@ const ProperyDialog = ({ open, onClose }) => {
         name={field.name}
         type={field.type}
         register={register}
-        error={
-          errors[field.name as keyof PropertyPayload]
-            ?.message
-        }
+       error={
+  String(
+    errors[
+      field.name as keyof typeof errors
+    ]?.message || ""
+  )
+}
       />
     );
   })}
@@ -192,13 +227,12 @@ const ProperyDialog = ({ open, onClose }) => {
             className="hidden"
             onChange={(e) => {
               const file =
-                e.target.files?.[0] || null;
-
-              setValue("image", file, {
-                shouldValidate: true,
-              });
+                e.target.files?.[0];
 
               if (file) {
+                setValue("image", file, {
+                shouldValidate: true,
+              });
                 setPreview(
                   URL.createObjectURL(file)
                 );

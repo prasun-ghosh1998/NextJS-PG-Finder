@@ -2,10 +2,7 @@
 
 import { Edit, MapPin, Plus, Trash2 } from "lucide-react";
 import ProperyDialog from "./Modal";
-import {
-  usePropertyDelete,
-  usePropertyList,
-} from "@/hooks/useProperty";
+import { usePropertyDelete, usePropertyList } from "@/hooks/useProperty";
 import { useState } from "react";
 
 const ListingTable = () => {
@@ -14,10 +11,9 @@ const ListingTable = () => {
   const deleteMutation = usePropertyDelete();
   const [open, setOpen] = useState(false);
 
-  const [selectedProperty, setSelectedProperty] =
-    useState<any>(null);
+  const [selectedProperty, setSelectedProperty] = useState<any>(null);
 
-      const handleEdit = (item: any) => {
+  const handleEdit = (item: any) => {
     setSelectedProperty(item);
 
     setOpen(true);
@@ -28,7 +24,6 @@ const ListingTable = () => {
 
     setOpen(true);
   };
-
 
   const handleDelete = async (id: string) => {
     const confirmDelete = confirm("Delete this property?");
@@ -53,7 +48,6 @@ const ListingTable = () => {
 
         <button
           onClick={() => {
-
             setOpen(true);
           }}
           className="bg-gradient-to-r from-green-800 to-green-500 hover:bg-green-950 text-white px-6 py-3 rounded-2xl flex items-center gap-3 transition"
@@ -61,15 +55,15 @@ const ListingTable = () => {
           <Plus size={20} />
           Add Listing
         </button>
-<ProperyDialog
-        open={open}
-        property={selectedProperty}
-        onClose={() => {
-          setOpen(false);
+        <ProperyDialog
+          open={open}
+          property={selectedProperty}
+          onClose={() => {
+            setOpen(false);
 
-          setSelectedProperty(null);
-        }}
-      />      
+            setSelectedProperty(null);
+          }}
+        />
       </div>
 
       {/* TABLE */}
@@ -108,7 +102,9 @@ const ListingTable = () => {
                     />
 
                     <div>
-                      <h4 className="font-bold text-lg text-black">{item.title}</h4>
+                      <h4 className="font-bold text-lg text-black">
+                        {item.title}
+                      </h4>
 
                       <p className="text-sm text-gray-500">
                         ID #{String(item.id).slice(0, 6)}
@@ -131,7 +127,9 @@ const ListingTable = () => {
                   </span>
                 </td>
 
-                <td className="px-6 py-6 font-bold text-black">₹ {item.price}</td>
+                <td className="px-6 py-6 font-bold text-black">
+                  ₹ {item.price}
+                </td>
 
                 <td className="px-6 py-6 text-black">{item.amenities}</td>
 
@@ -150,7 +148,7 @@ const ListingTable = () => {
                 <td className="px-6 py-6">
                   <div className="flex items-center gap-3">
                     <button
-                        onClick={() => handleEdit(item)}
+                      onClick={() => handleEdit(item)}
                       className="w-10 h-10 rounded-xl bg-indigo-100 text-indigo-600 flex items-center justify-center"
                     >
                       <Edit size={18} />
