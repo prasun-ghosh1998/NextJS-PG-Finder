@@ -81,7 +81,7 @@ const ListingTable = () => {
 
               <th className="px-6 py-5 font-semibold">Amenities</th>
 
-              {/* <th className="px-6 py-5 font-semibold">Status</th> */}
+              <th className="px-6 py-5 font-semibold">Status</th>
 
               <th className="px-6 py-5 font-semibold">Actions</th>
             </tr>
