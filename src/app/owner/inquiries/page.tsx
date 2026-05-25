@@ -1,25 +1,41 @@
-import ChatWindow from "@/components/ownerDashboard/ChatWindow";
-import InquiryList from "@/components/ownerDashboard/InquiryList";
+"use client";
+
+import { useEffect, useState } from "react";
 import RecentChats from "@/components/ownerDashboard/RecentChats";
+import ChatWindow from "@/components/ownerDashboard/ChatWindow";
+import { supabase } from "@/lib/supabaseclient";
 
-const Inquiries = () => {
+export default function Inquiries() {
+  const [ownerId, setOwnerId] = useState("");
+  const [selectedConversation, setSelectedConversation] = useState("");
+
+  useEffect(() => {
+    const getOwner = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      setOwnerId(user?.id || "");
+    };
+
+    getOwner();
+  }, []);
+
   return (
-    <div>
-      <div className="grid grid-cols-12 gap-6">
-        <div className="col-span-3">
-          <InquiryList />
-        </div>
+    <div className="grid grid-cols-12 gap-6">
+      <div className="col-span-4">
+        <RecentChats
+          ownerId={ownerId}
+          setSelectedConversation={setSelectedConversation}
+        />
+      </div>
 
-        <div className="col-span-3">
-          <RecentChats />
-        </div>
-
-        <div className="col-span-6">
-          <ChatWindow />
-        </div>
+      <div className="col-span-8">
+        <ChatWindow
+          ownerId={ownerId}
+          conversationId={selectedConversation}
+        />
       </div>
     </div>
   );
-};
-
-export default Inquiries;
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   X,
   MapPin,
@@ -9,8 +9,8 @@ import {
   MessageCircle,
   ShieldCheck,
 } from "lucide-react";
-
 import UserChatModal from "./UserChatModal";
+import { supabase } from "@/lib/supabaseclient";
 
 interface OwnerModalProps {
   open: boolean;
@@ -27,20 +27,74 @@ export default function OwnerDetails({
 }: OwnerModalProps) {
   const [loading, setLoading] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState("");
+  const [ownerData, setOwnerData] = useState<any>(owner);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      setCurrentUserId(user?.id || "");
+    };
+
+    getUser();
+  }, []);
+
+  useEffect(() => {
+    const fetchOwnerFullData = async () => {
+      if (!owner?.email) return;
+
+      const { data, error } = await supabase
+        .from("registration")
+        .select("*")
+        .eq("email", owner.email)
+        .single();
+
+      if (error) {
+        console.log("Owner fetch error:", error);
+        return;
+      }
+
+      setOwnerData(data);
+    };
+
+    fetchOwnerFullData();
+  }, [owner]);
 
   const selectedChat = {
-    owner,
+    owner: ownerData,
     property,
+    owner_id: ownerData?.auth_user_id,
+    property_id: property?.id,
   };
 
+  console.log("CHAT DATA", {
+  userId: currentUserId,
+  ownerId: ownerData?.auth_user_id,
+  propertyId: property?.id,
+});
+
   const handleChat = () => {
+    if (!currentUserId || !ownerData?.auth_user_id || !property?.id) {
+      console.log("Missing chat data:", {
+        currentUserId,
+        ownerAuthId: ownerData?.auth_user_id,
+        propertyId: property?.id,
+        ownerData,
+        property,
+      });
+      return;
+    }
+
     setLoading(true);
 
     setTimeout(() => {
       setLoading(false);
       onClose();
       setChatOpen(true);
-    }, 800);
+    }, 500);
   };
 
   if (!open && !chatOpen) return null;
@@ -67,8 +121,8 @@ export default function OwnerDetails({
                     Verified Owner
                   </div>
 
-                  <h2 className="text-2xl font-bold bg-gradient-to-b from-green-400 via-green-600 to-green-800 bg-clip-text text-transparent">
-                    {owner?.name || "Owner Name"}
+                  <h2 className="bg-gradient-to-b from-green-400 via-green-600 to-green-800 bg-clip-text text-2xl font-bold text-transparent">
+                    {ownerData?.name || "Owner Name"}
                   </h2>
 
                   <p className="mt-2 flex items-center gap-2 text-sm text-gray-200">
@@ -88,13 +142,12 @@ export default function OwnerDetails({
                     <div className="rounded-xl bg-white p-3 shadow-sm">
                       <Mail className="h-5 w-5 text-green-700" />
                     </div>
-
                     <div>
                       <p className="text-xs font-medium text-gray-400">
                         Email Address
                       </p>
                       <p className="font-semibold text-gray-800">
-                        {owner?.email || "No email"}
+                        {ownerData?.email || "No email"}
                       </p>
                     </div>
                   </div>
@@ -103,13 +156,12 @@ export default function OwnerDetails({
                     <div className="rounded-xl bg-white p-3 shadow-sm">
                       <Phone className="h-5 w-5 text-green-700" />
                     </div>
-
                     <div>
                       <p className="text-xs font-medium text-gray-400">
                         Phone Number
                       </p>
                       <p className="font-semibold text-gray-800">
-                        {owner?.phone || "No phone"}
+                        {ownerData?.phone || "No phone"}
                       </p>
                     </div>
                   </div>
@@ -118,7 +170,7 @@ export default function OwnerDetails({
                 <div className="mt-10">
                   <button
                     onClick={handleChat}
-                    disabled={loading}
+                    disabled={loading || !currentUserId}
                     className="flex h-14 w-full items-center justify-center gap-2 rounded-2xl bg-green-700 text-sm font-semibold text-white transition hover:bg-green-800 disabled:opacity-60"
                   >
                     <MessageCircle className="h-5 w-5" />
@@ -135,6 +187,7 @@ export default function OwnerDetails({
         open={chatOpen}
         setOpen={setChatOpen}
         selectedChat={selectedChat}
+        userId={currentUserId}
       />
     </>
   );

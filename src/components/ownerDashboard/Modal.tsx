@@ -88,14 +88,14 @@ const ProperyDialog = ({ open, onClose }: PropertyDialogProps) => {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="!w-[50%] !max-w-[1200px] overflow-hidden rounded-[32px] border-0 bg-white p-0 shadow-2xl">
         {/* Header */}
-        <div className="relative h-40 bg-gradient-to-b from-green-800 via-green-600 to-green-400">
+        <div className="relative h-30 bg-gradient-to-b from-green-800 via-green-600 to-green-400">
           <DialogClose>
-            <button className="absolute top-6 right-6 flex h-11 w-11 items-center justify-center rounded-2xl bg-white/20 text-white transition hover:bg-white/30">
+            {/* <button className="absolute top-6 right-6 flex h-11 w-11 items-center justify-center rounded-2xl bg-white/20 text-white transition hover:bg-white/30">
               <X size={22} />
-            </button>
+            </button> */}
           </DialogClose>
 
-          <div className="absolute bottom-8 left-8">
+          <div className="absolute bottom-5 left-8">
             <DialogTitle className="text-3xl font-bold text-white">
               Add Product
             </DialogTitle>
@@ -108,7 +108,7 @@ const ProperyDialog = ({ open, onClose }: PropertyDialogProps) => {
 
         {/* Form */}
         <form
-          className="space-y-8 p-8 md:p-10"
+          className="space-y-5 p-8 md:p-10"
           onSubmit={handleSubmit(onSubmit)}
         >
           {/* Inputs */}
@@ -163,7 +163,7 @@ const ProperyDialog = ({ open, onClose }: PropertyDialogProps) => {
                       Amenities
                     </label>
 
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-6 gap-10">
                       {amenitiesList.map((item) => (
                         <label
                           key={item}
@@ -218,7 +218,7 @@ const ProperyDialog = ({ open, onClose }: PropertyDialogProps) => {
                 <Image
                   src={preview}
                   alt="Preview"
-                  width={180}
+                  width={150}
                   height={180}
                   className="h-44 w-[60%] rounded-2xl object-cover shadow-md"
                 />
