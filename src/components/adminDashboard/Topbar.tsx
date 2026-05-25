@@ -1,4 +1,4 @@
-import { Bell, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import AdminProfile from "./AdminProfile";
 
 export default function Topbar() {
@@ -6,7 +6,6 @@ export default function Topbar() {
     <div className="flex justify-between items-center mb-6 ms-auto">
 
       <div className="flex items-center gap-4">
-        <Bell className="text-white" />
         <Mail className="text-white" />
         <div className="flex items-center gap-2">
           <AdminProfile/>

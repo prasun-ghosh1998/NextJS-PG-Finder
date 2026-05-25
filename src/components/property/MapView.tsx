@@ -1,29 +1,25 @@
 "use client";
 
-export default function MapView({ data }:any) {
-  if (!data.length) return <p>No locations found</p>;
+import dynamic from "next/dynamic";
 
-  return (
-    <div className="space-y-6">
+const IndiaMap = dynamic(
+  () => import("./IndiaMap"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex h-[600px] items-center justify-center rounded-2xl border">
+        Loading Map...
+      </div>
+    ),
+  }
+);
 
-      {data.map((item:any) => (
-        <div key={item.id} className="bg-white rounded-xl overflow-hidden shadow">
-          
-          <div className="p-3 font-semibold">{item.title}</div>
+interface Props {
+  data: any[];
+}
 
-          <iframe
-            width="100%"
-            height="250"
-            loading="lazy"
-            className="border-0"
-            src={`https://www.google.com/maps?q=${encodeURIComponent(
-              item.location
-            )}&output=embed`}
-          ></iframe>
-
-        </div>
-      ))}
-
-    </div>
-  );
+export default function MapView({
+  data,
+}: Props) {
+  return <IndiaMap data={data} />;
 }

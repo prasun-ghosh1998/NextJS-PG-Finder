@@ -3,11 +3,14 @@
 import { useAuthStorte } from "@/store/useAuthStore";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
+import ProfileModal from "./ProfileModal";
 
 export default function Navbar() {
   const pathname = usePathname();
   const { token, role } = useAuthStorte();
   const isActive = (path: string) => pathname === path;
+   const [open, setOpen] = useState(false);
 
   const navClass = (path: string) =>
   `relative text-[16px] transition duration-300 pb-1
@@ -105,13 +108,18 @@ export default function Navbar() {
           Owner Dashboard
         </Link>
       ) : (
-        <Link
-          href="/user"
-          className="px-4 py-2 rounded-full  bg-gradient-to-r from-green-700 to-green-400 text-white  hover:from-green-900 hover:to-green-600 transition-all duration-300"
-        >
-          Profile
-        </Link>
+         <button
+        onClick={() => setOpen(true)}
+        className="rounded-xl bg-green-600 px-5 py-2 text-white"
+      >
+        Profile
+      </button>
       )}
+
+      <ProfileModal
+        open={open}
+        onClose={() => setOpen(false)}
+      />
     </div>
   );
 }

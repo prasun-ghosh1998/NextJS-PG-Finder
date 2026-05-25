@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 export const UsersOwnersTable = () => {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<"all" | "user" | "owner">("all");
 
   useEffect(() => {
     fetchUsers();
@@ -39,6 +40,27 @@ Role: ${user.role}
 Status: ${user.status || "Active"}
     `);
   };
+
+  const handleDelete = async (id: string) => {
+    const confirmDelete = confirm("Are you sure you want to delete this user?");
+
+    if (!confirmDelete) return;
+
+    const { error } = await supabase.from("registration").delete().eq("id", id);
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    fetchUsers();
+  };
+
+  const filteredUsers = users.filter((user) => {
+  if (filter === "all") return true;
+
+  return user.role?.toLowerCase() === filter;
+});
   return (
     <div className="bg-[#111827] border border-gray-800 rounded-3xl p-6 overflow-x-auto">
       <div className="flex items-center justify-between mb-6">
@@ -47,12 +69,36 @@ Status: ${user.status || "Active"}
         </h3>
 
         <div className="flex gap-3">
-          <button className="bg-cyan-500 hover:bg-cyan-400 text-black px-5 py-3 rounded-xl font-semibold transition-all">
+          <button
+            onClick={() => setFilter("all")}
+            className={`px-5 py-3 rounded-xl font-semibold transition-all ${
+              filter === "all"
+                ? "bg-green-500 text-black"
+                : "bg-gray-800 text-white"
+            }`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setFilter("user")}
+            className={`px-5 py-3 rounded-xl font-semibold transition-all ${
+              filter === "user"
+                ? "bg-cyan-500 text-black"
+                : "bg-gray-800 text-white"
+            }`}
+          >
             Users (
             {users.filter((u) => u.role?.toLowerCase() === "user").length})
           </button>
 
-          <button className="bg-purple-500 hover:bg-purple-400 text-black px-5 py-3 rounded-xl font-semibold transition-all">
+          <button
+            onClick={() => setFilter("owner")}
+            className={`px-5 py-3 rounded-xl font-semibold transition-all ${
+              filter === "owner"
+                ? "bg-purple-500 text-black"
+                : "bg-gray-800 text-white"
+            }`}
+          >
             Owners (
             {users.filter((u) => u.role?.toLowerCase() === "owner").length})
           </button>
@@ -75,7 +121,7 @@ Status: ${user.status || "Active"}
 
         <tbody>
           {!loading &&
-            users.map((user) => (
+            filteredUsers.map((user) => (
               <tr
                 key={user.id}
                 className="border-b border-gray-800 hover:bg-[#1E293B] transition-all"
@@ -146,6 +192,13 @@ Status: ${user.status || "Active"}
                       className="bg-blue-500 hover:bg-blue-600 px-4 py-2 rounded-lg text-sm"
                     >
                       View
+                    </button>
+
+                    <button
+                      onClick={() => handleDelete(user.id)}
+                      className="bg-red-500 hover:bg-red-600 px-4 py-2 rounded-lg text-sm"
+                    >
+                      Delete
                     </button>
                   </div>
                 </td>

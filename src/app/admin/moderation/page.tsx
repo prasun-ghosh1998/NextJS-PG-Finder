@@ -62,6 +62,7 @@ export default function ModerationPage() {
                   location={item.location}
                   owner={item.owner}
                   badge={item.badge}
+                  status={item.status}
                   danger={item.danger}
                   action={
                     updateAction

@@ -30,4 +30,5 @@ export type AuthState = {
   registerUser: (data: RegisterFormValues) => Promise<any>;
   loginUser: (data: LoginFormValues) => Promise<any>;
   logout: ()=> void;
+  setUser: (user: User | null) => void;
 };

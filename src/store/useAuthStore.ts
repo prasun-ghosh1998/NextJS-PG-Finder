@@ -11,6 +11,19 @@ export const useAuthStorte = create<AuthState>((set) => ({
   user: getCookie("user") ? JSON.parse(getCookie("user") as string) : null,
   success: false,
 
+  setUser: (user) => {
+  setCookie(
+    "user",
+    JSON.stringify(user),
+    {
+      maxAge: 24 * 7 * 60 * 60,
+      path: "/",
+    }
+  );
+
+  set({ user });
+},
+
 // Register
 
   registerUser: async (data) => {
@@ -33,6 +46,7 @@ export const useAuthStorte = create<AuthState>((set) => ({
         name: data.name,
         email: data.email,
         phone: data.phone,
+        image: null,
         role: "user",
         auth_user_id: authData.user?.id,
       });
@@ -113,4 +127,7 @@ export const useAuthStorte = create<AuthState>((set) => ({
     deleteCookie("user");
     window.location.href = "/login"
   }
+  
 }));
+
+

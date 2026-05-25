@@ -13,6 +13,8 @@ export interface Listing {
   owner: string;
   badge: string;
   danger: boolean;
+
+  status: "Pending" | "Approved" | "Rejected";
 }
 
 export const useModeration = () => {
@@ -75,6 +77,9 @@ export const useModeration = () => {
           "Unknown Owner",
 
         badge:
+          item.status || "Pending",
+
+        status:
           item.status || "Pending",
 
         danger:

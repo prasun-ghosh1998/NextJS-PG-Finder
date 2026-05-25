@@ -1,7 +1,7 @@
 export interface PropertyPayload {
   title: string;
   image: File | null;
-  amenities: string;
+  amenities: string[];
   price: string;
   location: string;
   name: string;
