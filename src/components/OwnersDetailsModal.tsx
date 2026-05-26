@@ -112,7 +112,7 @@ export default function OwnerDetails({
             </button>
 
             <div className="grid md:grid-cols-2">
-              <div className="relative h-[300px] bg-gray-900 md:h-full">
+              <div className="relative h-[300px] bg-gradient-to-t from-gray-700 via-gray-500 to-gray-400 md:h-full">
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
 
                 <div className="absolute bottom-6 left-6 text-white">

@@ -5,12 +5,15 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import ProfileModal from "./ProfileModal";
+import { Heart } from "lucide-react";
+import WishlistModal from "./WishlistModal";
 
 export default function Navbar() {
   const pathname = usePathname();
   const { token, role } = useAuthStorte();
   const isActive = (path: string) => pathname === path;
    const [open, setOpen] = useState(false);
+    const [wishlistOpen, setWishlistOpen] = useState(false);
 
   const navClass = (path: string) =>
   `relative text-[16px] transition duration-300 pb-1
@@ -108,17 +111,30 @@ export default function Navbar() {
           Owner Dashboard
         </Link>
       ) : (
-         <button
-        onClick={() => setOpen(true)}
-        className="rounded-xl bg-green-600 px-5 py-2 text-white"
-      >
-        Profile
-      </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setWishlistOpen(true)}
+              className="relative rounded-full bg-green-100 p-3 text-green-600 hover:bg-green-200"
+            >
+              <Heart className="h-5 w-5 fill-green-600" />
+            </button>
+
+            <button
+              onClick={() => setOpen(true)}
+              className="rounded-xl bg-green-600 px-5 py-2 text-white"
+            >
+              Profile
+            </button>
+          </div>
       )}
 
       <ProfileModal
         open={open}
         onClose={() => setOpen(false)}
+      />
+       <WishlistModal
+        open={wishlistOpen}
+        onClose={() => setWishlistOpen(false)}
       />
     </div>
   );

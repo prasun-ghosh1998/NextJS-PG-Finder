@@ -169,14 +169,9 @@ export default function ChatWindow({ selectedChat, userId, onClose }: Props) {
 
   return (
     <div className="flex h-[530px] flex-col bg-white">
-      <div className="flex items-center justify-between border-b px-5 py-4">
-        <h2 className="text-lg font-bold">Live Chat</h2>
+      <div className="flex items-center justify-between bg-gradient-to-b from-green-700 via-green-500 to-green-400 border-b px-5 py-4">
+        <h2 className="text-lg font-bold text-white">Live Chat</h2>
 
-        {onClose && (
-          <button onClick={onClose}>
-            <X size={18} />
-          </button>
-        )}
       </div>
 
       <div className="flex-1 overflow-y-auto bg-gray-50 px-4 py-4">
