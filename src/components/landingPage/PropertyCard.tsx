@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { Heart, MapPin, User } from "lucide-react";
+import { Heart, MapPin, Star, User } from "lucide-react";
 import { useEffect, useState } from "react";
 import OwnerDetails from "../OwnersDetailsModal";
 import { supabase } from "@/lib/supabaseclient";
+import PropertyDetailsModal from "../PropertyDetailsModal";
 
 interface Props {
   title: string;
@@ -26,10 +27,13 @@ export default function PropertyCard({
   property,
 }: Props) {
   const [open, setOpen] = useState(false);
+  const [propertyOpen, setPropertyOpen] = useState(false);
   const [wishlisted, setWishlisted] = useState(false);
+  const [avgRating, setAvgRating] = useState(0);
 
   useEffect(() => {
     checkWishlist();
+    fetchAverageRating();
   }, [property?.id]);
 
   const checkWishlist = async () => {
@@ -54,9 +58,7 @@ export default function PropertyCard({
     setWishlisted(!!data);
   };
 
-  const handleWishlist = async (
-    e: React.MouseEvent<HTMLButtonElement>
-  ) => {
+  const handleWishlist = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
 
     const {
@@ -101,9 +103,38 @@ export default function PropertyCard({
     }
   };
 
+  const fetchAverageRating = async () => {
+    if (!property?.id) return;
+
+    const { data, error } = await supabase
+      .from("property_ratings")
+      .select("rating")
+      .eq("property_id", property.id);
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    if (!data?.length) {
+      setAvgRating(0);
+      return;
+    }
+
+    const total = data.reduce(
+      (sum: number, current: any) => sum + current.rating,
+      0,
+    );
+
+    setAvgRating(total / data.length);
+  };
+
   return (
     <>
-      <div className="bg-[#F5F6FB] rounded-3xl shadow-md overflow-hidden hover:shadow-xl transition">
+      <div
+        onClick={() => setPropertyOpen(true)}
+        className="bg-[#F5F6FB] rounded-3xl shadow-md overflow-hidden hover:shadow-xl transition"
+      >
         <div className="relative h-[200px]">
           <Image
             src={image || "/placeholder.jpg"}
@@ -122,9 +153,7 @@ export default function PropertyCard({
           >
             <Heart
               className={`h-5 w-5 transition ${
-                wishlisted
-                  ? "fill-green-600 text-green-600"
-                  : "text-gray-500"
+                wishlisted ? "fill-green-600 text-green-600" : "text-gray-500"
               }`}
             />
           </button>
@@ -139,10 +168,20 @@ export default function PropertyCard({
               <span className="text-gray-500 text-sm">/month</span>
             </p>
           </div>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1 text-gray-500 text-sm">
+              <MapPin className="text-green-600" size={14} />
+              {location}
+            </div>
+            <div className=" flex items-center gap-1">
+              <Star className="size-4 fill-yellow-400 text-yellow-400" />
 
-          <div className="flex items-center gap-1 text-gray-500 text-sm">
-            <MapPin className="text-green-600" size={14} />
-            {location}
+              <span className="text-sm font-medium text-gray-700">
+                {avgRating ? avgRating.toFixed(1) : "0.0"}
+              </span>
+
+              <span className="text-xs text-gray-400">Rating</span>
+            </div>
           </div>
 
           <div className="flex items-center gap-2 rounded-2xl bg-white border p-3">
@@ -153,7 +192,10 @@ export default function PropertyCard({
           </div>
 
           <button
-            onClick={() => setOpen(true)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpen(true);
+            }}
             className="w-full px-4 py-2 rounded-full bg-gradient-to-r from-green-700 to-green-400 text-white hover:from-green-900"
           >
             Owner Details
@@ -171,6 +213,14 @@ export default function PropertyCard({
           </div>
         </div>
       </div>
+      <PropertyDetailsModal
+        open={propertyOpen}
+        onClose={() => {
+          setPropertyOpen(false);
+          fetchAverageRating();
+        }}
+        item={property}
+      />
 
       <OwnerDetails
         open={open}
