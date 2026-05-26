@@ -47,9 +47,7 @@ const ListingTable = () => {
         </div>
 
         <button
-          onClick={() => {
-            setOpen(true);
-          }}
+          onClick={handleAdd}
           className="bg-gradient-to-r from-green-800 to-green-500 hover:bg-green-950 text-white px-6 py-3 rounded-2xl flex items-center gap-3 transition"
         >
           <Plus size={20} />

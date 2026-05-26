@@ -10,7 +10,7 @@ export const productSchema = yup.object({
     .of(yup.string().required())
     .min(1, "Select at least one amenity")
     .required("Amenities is required"),
-  image: yup.mixed<File>().required("Image is required"),
+  image: yup.mixed<File>().notRequired(),
   tag: yup.string(),
   action: yup.string(),
   badge: yup.string(),

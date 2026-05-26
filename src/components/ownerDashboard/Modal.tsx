@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Dialog,
   DialogClose,
@@ -10,47 +12,26 @@ import { Input } from "../ui/inputs";
 import Image from "next/image";
 import DynamicInput from "../DynamicInput";
 import { PropertyInputFields } from "@/services/json/property.input";
-import { useState } from "react";
-import { usePropertyAdd } from "@/hooks/useProperty";
+import { useEffect, useState } from "react";
+import { usePropertyAdd, usePropertyUpdate } from "@/hooks/useProperty";
 import { useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { productSchema } from "@/services/validation/property.validation";
-import { X } from "lucide-react";
-
-interface Property {
-  id?: number;
-  title?: string;
-  location?: string;
-  price?: string;
-  image?: string;
-}
 
 interface PropertyDialogProps {
   open: boolean;
   onClose: () => void;
-  property?: Property | null;
+  property?: any;
 }
 
-export interface PropertyPayload {
-  title: string;
-  location: string;
-  price: string;
-  type: string;
-  amenities: string[];
-
-  image?: File;
-
-  tag?: string;
-  action?: string;
-  status?: string;
-
-  badge?: string;
-  danger?: boolean;
-  name?: string;
-}
-const ProperyDialog = ({ open, onClose }: PropertyDialogProps) => {
+const ProperyDialog = ({ open, onClose, property }: PropertyDialogProps) => {
   const [preview, setPreview] = useState<string | null>(null);
-  const { isError, isPending, mutate } = usePropertyAdd();
+
+  const addMutation = usePropertyAdd();
+  const updateMutation = usePropertyUpdate();
+
+  const isEdit = !!property?.id;
+  const isPending = addMutation.isPending || updateMutation.isPending;
 
   const {
     register,
@@ -58,7 +39,7 @@ const ProperyDialog = ({ open, onClose }: PropertyDialogProps) => {
     reset,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<any>({
     resolver: yupResolver(productSchema),
     defaultValues: {
       title: "",
@@ -66,55 +47,108 @@ const ProperyDialog = ({ open, onClose }: PropertyDialogProps) => {
       price: "",
       type: "",
       amenities: [],
-      tag: "",
-      action: "Avalable",
-      status: "pending",
     },
   });
 
-  const onSubmit = async (data: PropertyPayload) => {
-    console.log("data", data);
-    mutate(data, {
-      onSuccess: (response) => {
-        console.log("response in dialog", response);
-        reset();
-        onClose();
-        setPreview(null);
-      },
-    });
+  useEffect(() => {
+    if (property && open) {
+      reset({
+        title: property.title || "",
+        location: property.location || "",
+        price: property.price || "",
+        type: property.type || "",
+        amenities: property.amenities
+          ? String(property.amenities)
+              .split(",")
+              .map((a) => a.trim())
+          : [],
+        image: undefined,
+      });
+
+      setPreview(property.image || null);
+    }
+
+    if (!property && open) {
+      reset({
+        title: "",
+        location: "",
+        price: "",
+        type: "",
+        amenities: [],
+        image: undefined,
+      });
+      setPreview(null);
+    }
+  }, [property, open, reset]);
+
+  const onSubmit = async (data: any) => {
+    console.log("SUBMIT CLICKED");
+    console.log("isEdit =", isEdit);
+    console.log("property =", property);
+    console.log("form data =", data);
+    const payload = {
+      ...data,
+      amenities: Array.isArray(data.amenities)
+        ? data.amenities.join(", ")
+        : data.amenities,
+    };
+
+    if (isEdit) {
+      updateMutation.mutate(
+        {
+          id: property.id,
+          title: data.title,
+          location: data.location,
+          price: data.price,
+          type: data.type,
+          amenities: Array.isArray(data.amenities)
+            ? data.amenities.join(", ")
+            : data.amenities,
+          image: data.image ? data.image : property.image,
+        },
+        {
+          onSuccess: () => {
+            reset();
+            setPreview(null);
+            onClose();
+          },
+        },
+      );
+
+      return;
+    } else {
+      addMutation.mutate(data, {
+        onSuccess: () => {
+          reset();
+          setPreview(null);
+          onClose();
+        },
+      });
+    }
   };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="!w-[50%] !max-w-[1200px] overflow-hidden rounded-[32px] border-0 bg-white p-0 shadow-2xl">
-        {/* Header */}
         <div className="relative h-30 bg-gradient-to-b from-green-800 via-green-600 to-green-400">
-          <DialogClose>
-            {/* <button className="absolute top-6 right-6 flex h-11 w-11 items-center justify-center rounded-2xl bg-white/20 text-white transition hover:bg-white/30">
-              <X size={22} />
-            </button> */}
-          </DialogClose>
-
           <div className="absolute bottom-5 left-8">
             <DialogTitle className="text-3xl font-bold text-white">
-              Add Product
+              {isEdit ? "Update Property" : "Add Property"}
             </DialogTitle>
 
             <p className="mt-2 text-md text-green-100">
-              Manage your product details
+              Manage your property details
             </p>
           </div>
         </div>
 
-        {/* Form */}
         <form
-          className="space-y-5 p-8 md:p-10"
-          onSubmit={handleSubmit(onSubmit)}
+          onSubmit={handleSubmit(onSubmit, (err) => {
+            console.log("FORM VALIDATION ERROR", err);
+          })}
         >
-          {/* Inputs */}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {PropertyInputFields?.map((field) => {
-            
               if (field.name === "type") {
                 return (
                   <div key={field.name} className="space-y-2">
@@ -126,27 +160,20 @@ const ProperyDialog = ({ open, onClose }: PropertyDialogProps) => {
                       {...register("type")}
                       className="h-14 w-full rounded-2xl border border-gray-200 bg-white px-4 text-sm font-medium outline-none transition focus:border-green-500"
                     >
-                      <option value="" className="text-gray-700">
-                        Select Property Type
-                      </option>
-                      <option value="PG" className="text-gray-500">
-                        PG
-                      </option>
-                      <option value="Flat" className="text-gray-500">
-                        Flat
-                      </option>
+                      <option value="">Select Property Type</option>
+                      <option value="PG">PG</option>
+                      <option value="Flat">Flat</option>
                     </select>
 
                     {errors.type?.message && (
                       <p className="text-sm text-red-500">
-                        {errors.type.message}
+                        {String(errors.type.message)}
                       </p>
                     )}
                   </div>
                 );
               }
 
-              // Amenities Dropdown
               if (field.name === "amenities") {
                 const amenitiesList = [
                   "WiFi",
@@ -158,16 +185,16 @@ const ProperyDialog = ({ open, onClose }: PropertyDialogProps) => {
                 ];
 
                 return (
-                  <div key={field.name} className="space-y-3">
+                  <div key={field.name} className="space-y-3 md:col-span-2">
                     <label className="text-sm font-semibold text-gray-700">
                       Amenities
                     </label>
 
-                    <div className="grid grid-cols-6 gap-10">
+                    <div className="grid grid-cols-2 gap-4 md:grid-cols-6">
                       {amenitiesList.map((item) => (
                         <label
                           key={item}
-                          className="flex items-center gap-2 rounded-xl border border-gray-200 p-3 cursor-pointer hover:border-green-500"
+                          className="flex cursor-pointer items-center gap-2 rounded-xl border border-gray-200 p-3 hover:border-green-500"
                         >
                           <input
                             type="checkbox"
@@ -175,7 +202,6 @@ const ProperyDialog = ({ open, onClose }: PropertyDialogProps) => {
                             {...register("amenities")}
                             className="h-4 w-4 accent-green-600"
                           />
-
                           <span className="text-sm font-medium text-gray-700">
                             {item}
                           </span>
@@ -185,7 +211,7 @@ const ProperyDialog = ({ open, onClose }: PropertyDialogProps) => {
 
                     {errors.amenities?.message && (
                       <p className="text-sm text-red-500">
-                        {errors.amenities.message}
+                        {String(errors.amenities.message)}
                       </p>
                     )}
                   </div>
@@ -199,18 +225,15 @@ const ProperyDialog = ({ open, onClose }: PropertyDialogProps) => {
                   name={field.name}
                   type={field.type}
                   register={register}
-                  error={String(
-                    errors[field.name as keyof typeof errors]?.message || "",
-                  )}
+                  error={String((errors as any)?.[field.name]?.message || "")}
                 />
               );
             })}
           </div>
 
-          {/* Upload Section */}
           <div>
             <label className="mb-3 block text-sm font-semibold text-gray-700">
-              Upload Product Image
+              Upload Property Image
             </label>
 
             <label className="flex cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed border-green-200 bg-green-50/50 p-6 transition hover:bg-green-50">
@@ -227,7 +250,6 @@ const ProperyDialog = ({ open, onClose }: PropertyDialogProps) => {
                   <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-green-700 text-3xl text-white">
                     +
                   </div>
-
                   <h3 className="text-sm font-bold text-gray-700">
                     Click to Upload Image
                   </h3>
@@ -242,9 +264,7 @@ const ProperyDialog = ({ open, onClose }: PropertyDialogProps) => {
                   const file = e.target.files?.[0];
 
                   if (file) {
-                    setValue("image", file, {
-                      shouldValidate: true,
-                    });
+                    setValue("image", file, { shouldValidate: true });
                     setPreview(URL.createObjectURL(file));
                   }
                 }}
@@ -252,14 +272,6 @@ const ProperyDialog = ({ open, onClose }: PropertyDialogProps) => {
             </label>
           </div>
 
-          {/* Error */}
-          {isError && (
-            <p className="rounded-2xl bg-red-100 p-3 text-sm font-medium text-red-500">
-              {isError}
-            </p>
-          )}
-
-          {/* Footer */}
           <DialogFooter className="flex gap-4">
             <DialogClose>
               <Button
@@ -275,7 +287,13 @@ const ProperyDialog = ({ open, onClose }: PropertyDialogProps) => {
               disabled={isPending}
               className="h-14 rounded-2xl bg-gradient-to-r from-green-700 to-green-500 px-10 font-bold text-white shadow-lg"
             >
-              {isPending ? "Adding..." : "Add Product"}
+              {isPending
+                ? isEdit
+                  ? "Updating..."
+                  : "Adding..."
+                : isEdit
+                  ? "Update Property"
+                  : "Add Property"}
             </Button>
           </DialogFooter>
         </form>
