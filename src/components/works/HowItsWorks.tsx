@@ -59,8 +59,10 @@ export function HowItWorks() {
                 {item.id}
               </div>
 
-              <h3 className="text-black text-3xl font-semibold mb-4">{item.title}</h3>
-              <p className="text-black text-base leading-7 opacity-80 max-w-md">
+              <h3  className={`text-3xl font-semibold mb-4 ${
+    item.id === "04" ? "text-white" : "text-black"
+  }`}>{item.title}</h3>
+              <p className={`text-black text-base leading-7 opacity-80 max-w-md ${item.id === "04" ? "text-white" : "text-black"}`}>
                 {item.desc}
               </p>
               {item.img && (

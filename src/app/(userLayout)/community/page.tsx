@@ -1,14 +1,14 @@
 
 
 import { HeroSec } from "@/components/community/HeroSec"
-import { MatchesSec } from "@/components/community/MatchesSec"
+import FeedbackSection from "@/components/community/MatchesSec"
 import { StoriesSec } from "@/components/community/StoriesSec"
 
 const Community = () => {
   return (
     <>
     <HeroSec/>
-    <MatchesSec/>
+    <FeedbackSection/>
     <StoriesSec/>
     </>
   )

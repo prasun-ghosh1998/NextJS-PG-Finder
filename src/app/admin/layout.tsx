@@ -14,7 +14,7 @@ export default function AdminLayout({
       <Sidebar />
 
       {/* Main Section */}
-      <div className="flex-1 flex flex-col bg-[#373838] p-6">
+      <div className="flex-1 flex flex-col bg-[#373838] ">
         {/* Topbar */}
         <Topbar />
 

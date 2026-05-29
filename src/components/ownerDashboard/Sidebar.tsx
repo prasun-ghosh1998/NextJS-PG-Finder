@@ -10,6 +10,9 @@ import {
   MessageSquare,
 } from "lucide-react";
 import { useAuthStorte } from "@/store/useAuthStore";
+import Logo from "@/assets/images/landingPage/logo.png";
+import Image from "next/image";
+
 
 export default function Sidebar() {
   const pathname = usePathname();
@@ -38,19 +41,15 @@ export default function Sidebar() {
     <aside className="w-[280px] hidden lg:flex flex-col justify-between bg-gradient-to-b from-[#000000] via-[#2c2c2e] to-[#373838] text-white p-6">
       <div>
         {/* LOGO */}
-        <div className="flex items-center gap-3 mb-12">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center">
-            <Building2 size={28} />
-          </div>
-
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 via-emerald-500 to-green-600 bg-clip-text text-transparent">
-              PGFinder+
-            </h1>
-
-            <p className="text-sm text-gray-400">Owner Panel</p>
-          </div>
-        </div>
+        <Link href={"/"} className="flex items-center gap-5">
+          <Image
+          src={Logo}
+          alt="PGFinder Logo"
+          width={180}
+          height={60}
+          className="h-14 w-auto object-contain"
+        />
+        </Link>
 
         {/* MENUS */}
         <nav className="space-y-2">

@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { X, Star, MapPin, IndianRupee, User, Home } from "lucide-react";
+import {
+  X,
+  Star,
+  MapPin,
+  IndianRupee,
+  User,
+  Home,
+} from "lucide-react";
 import { supabase } from "@/lib/supabaseclient";
 
 export default function PropertyDetailsModal({
@@ -12,6 +19,7 @@ export default function PropertyDetailsModal({
   const [userId, setUserId] = useState("");
   const [rating, setRating] = useState(0);
   const [avgRating, setAvgRating] = useState(0);
+  const [feedback, setFeedback] = useState("");
 
   useEffect(() => {
     if (open && item?.id) {
@@ -31,20 +39,28 @@ export default function PropertyDetailsModal({
   const fetchRating = async () => {
     const { data: ratings } = await supabase
       .from("property_ratings")
-      .select("rating, user_id")
+      .select("rating, user_id, feedback")
       .eq("property_id", item.id);
 
     if (!ratings) return;
 
-    const total = ratings.reduce((sum: number, r: any) => sum + r.rating, 0);
+    const total = ratings.reduce(
+      (sum: number, r: any) => sum + r.rating,
+      0
+    );
+
     setAvgRating(ratings.length ? total / ratings.length : 0);
 
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    const myRating = ratings.find((r: any) => r.user_id === user?.id);
+    const myRating = ratings.find(
+      (r: any) => r.user_id === user?.id
+    );
+
     setRating(myRating?.rating || 0);
+    setFeedback(myRating?.feedback || "");
   };
 
   const handleRating = async (value: number) => {
@@ -53,11 +69,31 @@ export default function PropertyDetailsModal({
       return;
     }
 
+    setRating(value);
+  };
+
+  const handleFeedbackSubmit = async () => {
+    if (!userId) {
+      alert("Please login first");
+      return;
+    }
+
+    if (!rating) {
+      alert("Please select rating");
+      return;
+    }
+
+    if (!feedback.trim()) {
+      alert("Please write feedback");
+      return;
+    }
+
     const { error } = await supabase.from("property_ratings").upsert(
       {
         user_id: userId,
         property_id: item.id,
-        rating: value,
+        rating,
+        feedback,
       },
       {
         onConflict: "user_id,property_id",
@@ -66,10 +102,11 @@ export default function PropertyDetailsModal({
 
     if (error) {
       console.log(error);
+      alert(error.message);
       return;
     }
 
-    setRating(value);
+    alert("Feedback submitted successfully");
     fetchRating();
   };
 
@@ -147,14 +184,14 @@ export default function PropertyDetailsModal({
 
           <div className="rounded-2xl bg-gray-50 p-4">
             <h3 className="mb-2 text-lg font-semibold text-gray-900">
-              Property Rating
+              Property Rating & Feedback
             </h3>
 
             <p className="mb-3 text-sm text-gray-500">
               Average Rating: {avgRating.toFixed(1)} / 5
             </p>
 
-            <div className="flex gap-2">
+            <div className="mb-4 flex gap-2">
               {[1, 2, 3, 4, 5].map((value) => (
                 <button
                   key={value}
@@ -172,9 +209,24 @@ export default function PropertyDetailsModal({
               ))}
             </div>
 
+            <textarea
+              value={feedback}
+              onChange={(e) => setFeedback(e.target.value)}
+              placeholder="Write your feedback..."
+              rows={4}
+              className="w-full resize-none rounded-2xl border border-green-100 p-4 text-gray-700 outline-none focus:border-green-500"
+            />
+
+            <button
+              onClick={handleFeedbackSubmit}
+              className="mt-4 w-full rounded-2xl bg-gradient-to-r from-green-700 to-emerald-500 py-3 font-semibold text-white transition hover:scale-[1.02]"
+            >
+              Submit Feedback
+            </button>
+
             {!userId && (
               <p className="mt-3 text-sm text-red-500">
-                Login korle rating dite parbe.
+                Login korle rating & feedback dite parbe.
               </p>
             )}
           </div>

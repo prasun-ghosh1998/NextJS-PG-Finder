@@ -16,6 +16,7 @@ export default function PropartyListings() {
     const { data, error } = await supabase
       .from("property")
       .select("*")
+      .eq("status", "Approved")
       .order("created_at", { ascending: false })
       .limit(3);
 

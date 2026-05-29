@@ -17,7 +17,7 @@ const ModerationHeader = ({
   return (
     <div className="flex justify-between items-center mb-8">
       <div>
-        <h1 className="text-3xl font-bold">
+        <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-950 via-gray-700 to-gray-500 bg-clip-text text-transparent">
           Listing Moderation
         </h1>
 

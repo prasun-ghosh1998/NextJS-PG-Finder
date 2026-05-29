@@ -1,5 +1,6 @@
 
 import StatsCards from "@/components/ownerDashboard/StatesCard";
+import TopUsers from "@/components/ownerDashboard/TopUsers";
 
 const OwnerDashboardPage = () => {
   return (
@@ -9,11 +10,9 @@ const OwnerDashboardPage = () => {
         
       </div>
 
-      {/* <div className="grid xl:grid-cols-1 gap-8 mt-10">
-        <BookingRequests />
-        <VerificationCard />
-
-      </div> */}
+      <div className="mt-10">
+        <TopUsers/>
+      </div>
     </>
   );
 };

@@ -129,7 +129,7 @@ const ProperyDialog = ({ open, onClose, property }: PropertyDialogProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="!w-[50%] !max-w-[1200px] overflow-hidden rounded-[32px] border-0 bg-white p-0 shadow-2xl">
+      <DialogContent className=" !w-[50%] !max-w-[1200px] overflow-hidden rounded-[32px] border-0 bg-white p-0 shadow-2xl">
         <div className="relative h-30 bg-gradient-to-b from-green-800 via-green-600 to-green-400">
           <div className="absolute bottom-5 left-8">
             <DialogTitle className="text-3xl font-bold text-white">
@@ -146,6 +146,7 @@ const ProperyDialog = ({ open, onClose, property }: PropertyDialogProps) => {
           onSubmit={handleSubmit(onSubmit, (err) => {
             console.log("FORM VALIDATION ERROR", err);
           })}
+          className="p-5"
         >
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             {PropertyInputFields?.map((field) => {

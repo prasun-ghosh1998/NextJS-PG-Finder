@@ -101,7 +101,13 @@ const ListingTable = () => {
 
                     <div>
                       <h4 className="font-bold text-lg text-black">
-                        {item.title}
+                        {item.title
+                          .split(" ")
+                          .map(
+                            (word: string) =>
+                              word.charAt(0).toUpperCase() + word.slice(1),
+                          )
+                          .join(" ")}
                       </h4>
 
                       <p className="text-sm text-gray-500">
@@ -139,7 +145,7 @@ const ListingTable = () => {
                         : "bg-green-100 text-green-600"
                     }`}
                   >
-                    {item.badge}
+                    {item.status}
                   </span>
                 </td>
 

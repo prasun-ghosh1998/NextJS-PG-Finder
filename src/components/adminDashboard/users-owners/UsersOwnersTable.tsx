@@ -57,14 +57,14 @@ Status: ${user.status || "Active"}
   };
 
   const filteredUsers = users.filter((user) => {
-  if (filter === "all") return true;
+    if (filter === "all") return true;
 
-  return user.role?.toLowerCase() === filter;
-});
+    return user.role?.toLowerCase() === filter;
+  });
   return (
-    <div className="bg-[#111827] border border-gray-800 rounded-3xl p-6 overflow-x-auto">
+    <div className="bg-white border border-gray-800 rounded-3xl p-6 overflow-x-auto">
       <div className="flex items-center justify-between mb-6">
-        <h3 className="text-2xl font-semibold text-white">
+        <h3 className="text-3xl font-semibold bg-gradient-to-r from-gray-950 via-gray-700 to-gray-500 bg-clip-text text-transparent">
           Users & Owner Details
         </h3>
 
@@ -107,7 +107,7 @@ Status: ${user.status || "Active"}
 
       <table className="w-full min-w-[1100px] text-white">
         <thead>
-          <tr className="border-b border-gray-800 text-left text-gray-400">
+          <tr className="border-b border-gray-800 text-left text-black">
             <th className="py-4">Name</th>
             <th>Email</th>
             <th>Phone</th>
@@ -122,10 +122,7 @@ Status: ${user.status || "Active"}
         <tbody>
           {!loading &&
             filteredUsers.map((user) => (
-              <tr
-                key={user.id}
-                className="border-b border-gray-800 hover:bg-[#1E293B] transition-all"
-              >
+              <tr key={user.id} className="border-b border-gray-400 ">
                 {/* Name */}
                 <td className="py-5">
                   <div className="flex items-center gap-3">
@@ -140,7 +137,7 @@ Status: ${user.status || "Active"}
                     </div>
 
                     <div>
-                      <p className="font-semibold">{user.name}</p>
+                      <p className="font-semibold text-black">{user.name}</p>
 
                       <p className="text-sm text-gray-400">
                         ID: #{user.id?.slice(0, 6)}
@@ -149,19 +146,19 @@ Status: ${user.status || "Active"}
                   </div>
                 </td>
 
-                <td>{user.email}</td>
+                <td className="text-gray-600">{user.email}</td>
 
-                <td>{user.phone || "N/A"}</td>
+                <td className="text-gray-600">{user.phone || "N/A"}</td>
 
-                <td>{user.city || "Kolkata"}</td>
+                <td className="text-gray-600">{user.city || "Kolkata"}</td>
 
                 {/* Role */}
                 <td>
                   <span
-                    className={`px-3 py-1 rounded-full text-sm ${
+                    className={`px-3 py-1 rounded-full font-medium ${
                       user.role?.toLowerCase() === "owner"
-                        ? "bg-purple-500/20 text-purple-400"
-                        : "bg-cyan-500/20 text-cyan-400"
+                        ? "bg-purple-500/20 text-purple-600"
+                        : "bg-cyan-500/20 text-cyan-600"
                     }`}
                   >
                     {user.role}
@@ -174,7 +171,7 @@ Status: ${user.status || "Active"}
                     className={`px-3 py-1 rounded-full text-sm ${
                       user.status === "Blocked"
                         ? "bg-red-500/20 text-red-400"
-                        : "bg-green-500/20 text-green-400"
+                        : "bg-green-500/20 text-green-600"
                     }`}
                   >
                     {user.status || "Active"}
@@ -182,7 +179,9 @@ Status: ${user.status || "Active"}
                 </td>
 
                 {/* Date */}
-                <td>{new Date(user.created_at).toLocaleDateString()}</td>
+                <td className="text-gray-600">
+                  {new Date(user.created_at).toLocaleDateString()}
+                </td>
 
                 {/* Actions */}
                 <td>

@@ -34,7 +34,7 @@ export default function ChartSection() {
   };
 
   return (
-    <div className="bg-[#1A2236] p-6 rounded-xl w-full">
+    <div className="bg-white p-6 rounded-xl w-full">
       <h2 className="text-lg font-semibold mb-4">User Growth Trends</h2>
 
       <ResponsiveContainer width="100%" height={250}>

@@ -29,10 +29,6 @@ export function HeroSec() {
             Experience the Urban Oasis where intelligent matching meets human
             connection. Your perfect roommate is just a profile away.
           </p>
-
-          <button className="mt-8 bg-emerald-400 text-black px-8 py-4 rounded-full font-semibold text-lg shadow-lg hover:bg-emerald-300 transition">
-            Start Matching
-          </button>
         </div>
       </div>
     </section>
