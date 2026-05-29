@@ -93,7 +93,7 @@ export default function Navbar() {
 
           {/* SIGNUP */}
           <Link
-            href="/signup"
+            href="/register"
             className="rounded-full bg-gradient-to-r from-green-700 via-emerald-600 to-green-500 px-6 py-2.5 font-semibold tracking-wide text-white shadow-lg transition-all duration-300 hover:scale-105 hover:shadow-green-300"
           >
             Signup
