@@ -125,7 +125,7 @@ export const useAuthStorte = create<AuthState>((set) => ({
     deleteCookie("token");
     deleteCookie("role");
     deleteCookie("user");
-    window.location.href = "/login"
+    window.location.href = "/"
   }
   
 }));

@@ -12,34 +12,6 @@ import { useEffect, useState } from "react";
 export default function StatsCards() {
 
 
-//   const stats = [
-//     {
-//       title: "Total Listings",
-//       value: "24",
-//       icon: Building2,
-//       color: "bg-indigo-500",
-//     },
-//     // {
-//     //   title: "Views",
-//     //   value: "12.4K",
-//     //   icon: Eye,
-//     //   color: "bg-pink-500",
-//     // },
-//     {
-//       title: "Inquiries",
-//       value: "186",
-//       icon: MessageCircle,
-//       color: "bg-orange-500",
-//     },
-//     // {
-//     //   title: "Revenue",
-//     //   value: "₹1.2L",
-//     //   icon: Wallet,
-//     //   color: "bg-green-500",
-//     // },
-//   ];
-
-
  const [stats, setStats] = useState({
     listings: 0,
     inquiries: 0,
@@ -50,12 +22,10 @@ export default function StatsCards() {
   }, []);
 
   const fetchStats = async () => {
-    // Total Listings
     const { count: listingsCount, error: listingsError } = await supabase
       .from("property")
       .select("*", { count: "exact", head: true });
 
-    // Total Inquiries
     const { count: inquiriesCount, error: inquiriesError } = await supabase
       .from("inquiries") // change table name if different
       .select("*", { count: "exact", head: true });

@@ -71,10 +71,10 @@ export default function OwnerDetails({
   };
 
   console.log("CHAT DATA", {
-  userId: currentUserId,
-  ownerId: ownerData?.auth_user_id,
-  propertyId: property?.id,
-});
+    userId: currentUserId,
+    ownerId: ownerData?.auth_user_id,
+    propertyId: property?.id,
+  });
 
   const handleChat = () => {
     if (!currentUserId || !ownerData?.auth_user_id || !property?.id) {
@@ -113,6 +113,14 @@ export default function OwnerDetails({
 
             <div className="grid md:grid-cols-2">
               <div className="relative h-[300px] bg-gradient-to-t from-gray-700 via-gray-500 to-gray-400 md:h-full">
+                {ownerData?.image && (
+                  <img
+                    src={ownerData.image}
+                    alt={ownerData?.name || "Owner"}
+                    className="absolute inset-0 h-full w-full object-cover"
+                  />
+                )}
+
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
 
                 <div className="absolute bottom-6 left-6 text-white">

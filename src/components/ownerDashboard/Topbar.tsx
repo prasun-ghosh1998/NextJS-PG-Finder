@@ -1,16 +1,20 @@
 "use client";
 
-import { Bell, MessageCircle } from "lucide-react";
+import { Bell, Camera, MessageCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabaseclient";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function Topbar() {
   const [owner, setOwner] = useState<any>(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [uploading, setUploading] = useState(false);
+
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -50,7 +54,6 @@ export default function Topbar() {
     }
 
     setOwner(data);
-
     fetchUnread(data.auth_user_id);
     fetchNotifications(data.auth_user_id);
   };
@@ -90,22 +93,81 @@ export default function Topbar() {
     setNotifications(data || []);
   };
 
-  const handleNotificationClick = async (item: any) => {
-    if (!item.is_seen) {
-      await supabase
-        .from("messages")
-        .update({ is_seen: true })
-        .eq("id", item.id);
+  const handleBellClick = async () => {
+    setOpen((prev) => !prev);
 
-      setUnreadCount((prev) => (prev > 0 ? prev - 1 : 0));
+    if (!owner?.auth_user_id || notifications.length === 0) return;
 
-      setNotifications((prev) =>
-        prev.filter((notification) => notification.id !== item.id)
-      );
+    const ids = notifications.map((item) => item.id);
+
+    const { error } = await supabase
+      .from("messages")
+      .update({ is_seen: true })
+      .in("id", ids);
+
+    if (error) {
+      console.log(error.message);
+      return;
     }
 
+    setUnreadCount(0);
+  };
+
+  const handleNotificationClick = () => {
     setOpen(false);
     router.push("/owner/inquiries");
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (!file || !owner?.id) return;
+
+    try {
+      setUploading(true);
+
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${owner.id}-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("profile")
+        .upload(fileName, file, {
+          upsert: true,
+        });
+
+      if (uploadError) {
+        toast.error(uploadError.message);
+        return;
+      }
+
+      const { data } = supabase.storage.from("profile").getPublicUrl(fileName);
+
+      const imageUrl = data.publicUrl;
+
+      const { error: updateError } = await supabase
+        .from("registration")
+        .update({
+          image: imageUrl,
+        })
+        .eq("id", owner.id);
+
+      if (updateError) {
+        toast.error(updateError.message);
+        return;
+      }
+
+      setOwner((prev: any) => ({
+        ...prev,
+        image: imageUrl,
+      }));
+
+      toast.success("Profile image updated");
+    } catch (error) {
+      console.log(error);
+      toast.error("Image upload failed");
+    } finally {
+      setUploading(false);
+    }
   };
 
   useEffect(() => {
@@ -130,7 +192,7 @@ export default function Topbar() {
 
           const audio = new Audio("/notification.mp3");
           audio.play().catch(() => {});
-        }
+        },
       )
       .subscribe();
 
@@ -154,7 +216,7 @@ export default function Topbar() {
       <div className="flex items-center gap-4">
         <div className="relative" ref={dropdownRef}>
           <button
-            onClick={() => setOpen(!open)}
+            onClick={handleBellClick}
             className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-green-400 to-emerald-600 text-white shadow-lg"
           >
             <Bell size={18} />
@@ -174,7 +236,7 @@ export default function Topbar() {
                 </h3>
 
                 <p className="text-sm text-gray-400">
-                  {unreadCount} unread messages
+                  {notifications.length} recent messages
                 </p>
               </div>
 
@@ -187,7 +249,7 @@ export default function Topbar() {
                   notifications.map((item) => (
                     <div
                       key={item.id}
-                      onClick={() => handleNotificationClick(item)}
+                      onClick={handleNotificationClick}
                       className="flex cursor-pointer gap-3 border-b border-zinc-800 px-5 py-4 hover:bg-zinc-900"
                     >
                       <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-green-500/20 text-green-400">
@@ -218,8 +280,35 @@ export default function Topbar() {
         </div>
 
         <div className="flex items-center gap-3 rounded-2xl bg-zinc-950 px-4 py-2">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-emerald-600 font-bold uppercase text-white">
-            {owner?.name?.charAt(0) || "O"}
+          <div className="group relative h-12 w-12 overflow-hidden rounded-full">
+            {owner?.image ? (
+              <img
+                src={owner.image}
+                alt={owner?.name || "Owner"}
+                className="h-full w-full rounded-full border-2 border-green-500 object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center rounded-full bg-gradient-to-br from-green-400 to-emerald-600 font-bold uppercase text-white">
+                {owner?.name?.charAt(0) || "O"}
+              </div>
+            )}
+
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              className="absolute inset-0 flex items-center justify-center bg-black/45 text-white opacity-0 transition group-hover:opacity-100"
+            >
+              <Camera size={16} />
+            </button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
           </div>
 
           <div>
@@ -228,7 +317,7 @@ export default function Topbar() {
             </h4>
 
             <p className="text-sm text-gray-400">
-              {owner?.role || "Owner"}
+              {uploading ? "Uploading..." : owner?.role || "Owner"}
             </p>
           </div>
         </div>

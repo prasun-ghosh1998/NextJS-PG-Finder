@@ -26,33 +26,43 @@ export default function Banner() {
         </div>
 
         {/* RIGHT */}
-       <div className="relative h-[550px] w-full overflow-hidden rounded-[30px] shadow-[0_20px_60px_rgba(0,0,0,0.18)]">
-  <img
-    src={HeroImg.src}
-    alt="hero"
-    className="h-full w-full object-cover"
-  />
+        <div
+          data-aos="fade-right"
+          data-aos-duration="1200"
+          data-aos-delay="200"
+          className="relative h-[550px] w-full overflow-hidden rounded-[30px] shadow-[0_20px_60px_rgba(0,0,0,0.18)]"
+        >
+          <img
+            src={HeroImg.src}
+            alt="hero"
+            className="h-full w-full object-cover"
+          />
 
-  <div className="absolute bottom-10 left-45 flex -translate-x-1/2 items-center gap-3 rounded-full bg-white/95 px-6 py-4 text-black shadow-2xl backdrop-blur-xl">
-    <div className="flex -space-x-3">
-      <img
-        src="https://randomuser.me/api/portraits/women/1.jpg"
-        alt="user"
-        className="h-9 w-9 rounded-full border-2 border-white"
-      />
-      <img
-        src="https://randomuser.me/api/portraits/men/2.jpg"
-        alt="user"
-        className="h-9 w-9 rounded-full border-2 border-white"
-      />
-    </div>
+          <div
+            data-aos="fade-up"
+            data-aos-delay="600"
+            className="absolute bottom-10 left-45 flex -translate-x-1/2 items-center gap-3 rounded-full bg-white/95 px-6 py-4 text-black shadow-2xl backdrop-blur-xl"
+          >
+            <div className="flex -space-x-3">
+              <img
+                src="https://randomuser.me/api/portraits/women/1.jpg"
+                alt="user"
+                className="h-9 w-9 rounded-full border-2 border-white"
+              />
+              <img
+                src="https://randomuser.me/api/portraits/men/2.jpg"
+                alt="user"
+                className="h-9 w-9 rounded-full border-2 border-white"
+              />
+            </div>
 
-    <p className="whitespace-nowrap text-sm text-gray-500">
-      Trusted by{" "}
-      <span className="font-bold text-green-700">12,000+</span> residents in the city.
-    </p>
-  </div>
-</div>
+            <p className="whitespace-nowrap text-sm text-gray-500">
+              Trusted by{" "}
+              <span className="font-bold text-green-700">12,000+</span>{" "}
+              residents in the city.
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );

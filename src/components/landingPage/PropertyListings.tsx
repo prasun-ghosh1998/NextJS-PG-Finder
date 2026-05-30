@@ -30,24 +30,35 @@ export default function PropartyListings() {
 
   return (
     <section className="px-10 py-16 bg-[#F7F8FC]">
-      <div className="flex justify-between items-end mb-10">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-800">
-            Handpicked for your lifestyle.
-          </h2>
-          <p className="text-gray-500 text-sm mt-1">
-            Curated collections based on the most requested living conditions in
-            the city.
-          </p>
-        </div>
+      <div className="mb-10 flex flex-col gap-6 rounded-[28px] border border-green-100 bg-gradient-to-r from-white via-emerald-50 to-green-100 p-6 shadow-[0_20px_60px_rgba(16,185,129,0.12)] md:flex-row md:items-end md:justify-between">
+  <div>
+    <span className="mb-3 inline-flex rounded-full bg-green-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-green-700">
+      Premium Picks
+    </span>
 
-        <Link
-          href="/property"
-          className="text-green-600 text-sm font-medium hover:underline"
-        >
-          View all properties →
-        </Link>
-      </div>
+    <h2 className="max-w-xl text-3xl font-extrabold leading-tight text-gray-900 md:text-5xl">
+      Handpicked for your{" "}
+      <span className="bg-gradient-to-r from-green-700 to-emerald-400 bg-clip-text text-transparent">
+        lifestyle.
+      </span>
+    </h2>
+
+    <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-500">
+      Curated collections based on the most requested living conditions in the
+      city.
+    </p>
+  </div>
+
+  <Link
+    href="/property"
+    className="group inline-flex items-center justify-center rounded-full bg-gradient-to-r from-green-600 to-emerald-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-green-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-green-300"
+  >
+    View all properties
+    <span className="ml-2 transition-transform duration-300 group-hover:translate-x-1">
+      →
+    </span>
+  </Link>
+</div>
 
       <div className="grid md:grid-cols-3 gap-8">
         {listings.map((item) => (

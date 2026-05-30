@@ -1,96 +1,248 @@
 "use client";
 
-import StoryImg from "@/assets/images/community/story-img.png"
-export function StoriesSec (){
+import { useEffect, useState } from "react";
+import { Plus } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, EffectFade } from "swiper/modules";
+
+import "swiper/css";
+import "swiper/css/effect-fade";
+
+import { supabase } from "@/lib/supabaseclient";
+import StoryModal from "./StoryModal";
+
+type Story = {
+  id: string;
+  user_id: string;
+  name: string;
+  image: string;
+  place: string;
+  quote: string;
+};
+
+type StoryFormValues = {
+  place: string;
+  quote: string;
+};
+
+export function StoriesSec() {
+  const [stories, setStories] = useState<Story[]>([]);
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const latestStory = stories[0];
+
+  const fetchStories = async () => {
+  const { data, error } = await supabase
+    .from("stories")
+    .select("id, user_id, name, image, place, quote, created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    console.log("Stories fetch error:", error.message);
+    return;
+  }
+
+  console.log("Stories data:", data);
+  setStories(data || []);
+};
+
+  useEffect(() => {
+    fetchStories();
+  }, []);
+
+  const addStory = async (values: any) => {
+  setLoading(true);
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    setLoading(false);
+    return;
+  }
+
+  const { data: profile } = await supabase
+    .from("registration")
+    .select("name, image")
+    .eq("auth_user_id", user.id)
+    .single();
+
+  let storyImage = profile?.image || "";
+
+  if (values.image?.[0]) {
+    const file = values.image[0];
+    const fileName = `${crypto.randomUUID()}-${file.name}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("story_image")
+      .upload(fileName, file);
+
+    if (uploadError) {
+      console.log(uploadError.message);
+      setLoading(false);
+      return;
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from("story_image")
+      .getPublicUrl(fileName);
+
+    storyImage = publicUrlData.publicUrl;
+  }
+
+  const { error } = await supabase.from("stories").insert([
+    {
+      user_id: user.id,
+      name: profile?.name || "User",
+      image: storyImage,
+      place: values.place,
+      quote: values.quote,
+    },
+  ]);
+
+  setLoading(false);
+
+  if (error) {
+    console.log(error.message);
+    return;
+  }
+
+  setOpen(false);
+  fetchStories();
+};
+
   return (
-    <>
     <section className="px-10 py-16">
-     <div className="space-y-8">
+      <div className="space-y-8">
         <h2 className="text-center text-5xl font-bold text-gray-600">
           Real Stories from the Oasis
         </h2>
 
-        <div className="grid md:grid-cols-[1.2fr_1fr] gap-6">
-          {/* Left Large Image Card */}
-          <div className=" relative rounded-[34px] overflow-hidden min-h-[600px]"
-          style={{
-          backgroundImage: `
-      linear-gradient(
-        to right,
-        rgba(6, 78, 59, 0.9),
-        rgba(6, 78, 59, 0.1)
-      ),
-       url(${StoryImg.src})
-    `,backgroundRepeat:"no-repeat",backgroundPosition:"100%"
-        }}
-        >
-            
+        <div className="grid gap-6 md:grid-cols-[1.2fr_1fr]">
+          <div className="relative min-h-[600px] overflow-hidden rounded-[34px]">
+            {stories.length > 0 ? (
+              <Swiper
+                modules={[Autoplay, EffectFade]}
+                effect="fade"
+                loop
+                speed={1000}
+                autoplay={{
+                  delay: 3000,
+                  disableOnInteraction: false,
+                }}
+                className="h-full w-full"
+              >
+                {stories.map((story) => (
+                  <SwiperSlide key={story.id}>
+                    <StorySlide story={story} />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            ) : (
+              <div className="flex h-[600px] items-center justify-center bg-emerald-900 text-white">
+                No stories found
+              </div>
+            )}
+          </div>
 
-            <div className="absolute bottom-8 left-8 right-8 bg-emerald-900/20 backdrop-blur rounded-[28px] p-8 text-white">
-              <p className="text-2xl leading-relaxed italic">
-                “We were matched by the AI based on our love for early morning
-                pilates and organic cooking. Six months later, we’re not just
-                roommates, we’re best friends.”
+          <div className="grid grid-rows-[1fr_auto] gap-6">
+            <div className="flex min-h-[290px] flex-col justify-between rounded-[34px] bg-[#CDEFD7] p-8 text-[#173B2E]">
+              <p className="text-6xl font-bold leading-none">❞</p>
+
+              <p className="mt-4 text-2xl italic leading-relaxed">
+                {latestStory?.quote || "No story added yet."}
               </p>
 
-              <div className="mt-6">
-                <h3 className="text-3xl font-semibold">Sarah & Jamie</h3>
-                <p className="text-gray-200 mt-1">Oakwood Apartments</p>
-              </div>
-            </div>
-          </div>
-           {/* Right Side Cards */}
-          <div className="grid grid-rows-[1fr_auto] gap-6">
-            {/* Quote Card */}
-            <div className="bg-[#CDEFD7] text-[#173B2E] rounded-[34px] p-8 flex flex-col justify-between min-h-[290px]">
-              <div>
-                <p className="text-6xl font-bold leading-none">❞</p>
-                <p className="text-2xl leading-relaxed italic mt-4">
-                  The verified profiles gave me peace of mind. I found a
-                  roommate who shares my values and professional drive.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-4 mt-8">
+              <div className="mt-8 flex items-center gap-4">
                 <img
-                  src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300"
-                  alt="David"
-                  className="w-14 h-14 rounded-full object-cover"
+                  src={
+                    latestStory?.image ||
+                    "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300"
+                  }
+                  alt={latestStory?.name || "User"}
+                  className="h-14 w-14 rounded-full object-cover"
                 />
+
                 <div>
-                  <h4 className="font-semibold text-xl">David L.</h4>
-                  <p className="text-sm opacity-70">Software Engineer</p>
+                  <h4 className="text-xl font-semibold">
+                    {latestStory?.name || "User"}
+                  </h4>
+                  <p className="text-sm opacity-70">
+                    {latestStory?.place || "Place"}
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Bottom Small Cards */}
             <div className="grid grid-cols-2 gap-6">
-              <div className="bg-[#E8E8E8] text-black rounded-[30px] p-8 min-h-[280px] flex flex-col justify-between">
-                <h3 className="text-6xl font-bold text-emerald-700">1.2k+</h3>
+              <div className="flex min-h-[280px] flex-col justify-between rounded-[30px] bg-[#E8E8E8] p-8 text-black">
+                <h3 className="text-6xl font-bold text-emerald-700">
+                  {stories.length}+
+                </h3>
 
                 <div>
                   <h4 className="text-2xl font-semibold">Happy Matches</h4>
-                  <p className="text-gray-500 mt-2">
+                  <p className="mt-2 text-gray-500">
                     Created this month across the city.
                   </p>
                 </div>
               </div>
-              <div className="bg-emerald-800 rounded-[30px] p-8 min-h-[280px] flex flex-col justify-between">
-                <div className="text-5xl">♡</div>
+
+              <button
+                type="button"
+                
+                onClick={() => setOpen(true)}
+                className="flex min-h-[280px] cursor-pointer flex-col justify-between rounded-[30px] bg-emerald-800 p-8 text-left text-white transition hover:scale-[1.02]"
+              >
+                <Plus size={34} />
 
                 <div>
                   <h4 className="text-2xl font-semibold">Share Your Story</h4>
-                  <p className="text-emerald-100 mt-2">
+                  <p className="mt-2 text-emerald-100">
                     Tell us how you found your home.
                   </p>
                 </div>
-              </div>
+              </button>
             </div>
           </div>
         </div>
       </div>
-      </section>
-    </>
-  )
+
+      <StoryModal
+        open={open}
+        setOpen={setOpen}
+        loading={loading}
+        onSubmit={addStory}
+      />
+    </section>
+  );
+}
+
+function StorySlide({ story }: { story: Story }) {
+  return (
+    <div
+      className="relative h-[600px] w-full bg-cover bg-center"
+      style={{
+        backgroundImage: `
+          linear-gradient(
+            to right,
+            rgba(6,78,59,0.9),
+            rgba(6,78,59,0.1)
+          ),
+          url(${story.image})
+        `,
+      }}
+    >
+      <div className="absolute bottom-8 left-8 right-8 rounded-[28px] bg-emerald-900/20 p-8 text-white backdrop-blur">
+        <p className="text-2xl italic leading-relaxed">“{story.quote}”</p>
+
+        <div className="mt-6">
+          <h3 className="text-3xl font-semibold">{story.name}</h3>
+          <p className="mt-1 text-gray-200">{story.place}</p>
+        </div>
+      </div>
+    </div>
+  );
 }

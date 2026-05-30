@@ -1,5 +1,3 @@
-
-
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -9,28 +7,21 @@ import FilterSide from "./FilterSide";
 import { supabase } from "@/lib/supabaseclient";
 
 export default function ContentSec() {
-  const [selectedPropertyType, setSelectedPropertyType] =
-    useState("");
+  const [selectedPropertyType, setSelectedPropertyType] = useState("");
 
-  const [selectedAmenities, setSelectedAmenities] =
-    useState<string[]>([]);
+  const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
 
   const [location, setLocation] = useState("");
 
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(100000);
 
-  const [view, setView] = useState<"grid" | "map">(
-    "grid"
-  );
+  const [view, setView] = useState<"grid" | "map">("grid");
 
   const [data, setData] = useState<any[]>([]);
-
-  // PAGINATION
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
 
-  // FETCH APPROVED DATA
   useEffect(() => {
     fetchProperties();
   }, []);
@@ -50,49 +41,29 @@ export default function ContentSec() {
     }
   };
 
-  // FILTER LOGIC
   const filteredData = useMemo(() => {
     return data.filter((item) => {
-      // PROPERTY TYPE
       const matchesProperty =
         selectedPropertyType === "" ||
-        item.type?.toLowerCase() ===
-          selectedPropertyType.toLowerCase();
+        item.type?.toLowerCase() === selectedPropertyType.toLowerCase();
 
-      // PRICE
       const matchesPrice =
-        Number(item.price) >= minPrice &&
-        Number(item.price) <= maxPrice;
+        Number(item.price) >= minPrice && Number(item.price) <= maxPrice;
 
-      // LOCATION
       const matchesLocation =
         location === "" ||
-        item.location
-          ?.toLowerCase()
-          .includes(location.toLowerCase());
+        item.location?.toLowerCase().includes(location.toLowerCase());
 
-      // AMENITIES
       const itemAmenities = item.amenities
-        ? item.amenities
-            .split(",")
-            .map((a: string) =>
-              a.trim().toLowerCase()
-            )
+        ? item.amenities.split(",").map((a: string) => a.trim().toLowerCase())
         : [];
 
       const matchesAmenities =
         selectedAmenities.length === 0 ||
-        selectedAmenities.every((a) =>
-          itemAmenities.includes(
-            a.toLowerCase()
-          )
-        );
+        selectedAmenities.every((a) => itemAmenities.includes(a.toLowerCase()));
 
       return (
-        matchesProperty &&
-        matchesPrice &&
-        matchesLocation &&
-        matchesAmenities
+        matchesProperty && matchesPrice && matchesLocation && matchesAmenities
       );
     });
   }, [
@@ -104,184 +75,132 @@ export default function ContentSec() {
     selectedAmenities,
   ]);
 
-  // RESET PAGE WHEN FILTER CHANGES
   useEffect(() => {
     setCurrentPage(1);
-  }, [
-    selectedPropertyType,
-    selectedAmenities,
-    location,
-    minPrice,
-    maxPrice,
-  ]);
+  }, [selectedPropertyType, selectedAmenities, location, minPrice, maxPrice]);
 
-  // PAGINATION LOGIC
-  const totalPages = Math.ceil(
-    filteredData.length / itemsPerPage
-  );
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  const startIndex =
-    (currentPage - 1) * itemsPerPage;
+  const startIndex = (currentPage - 1) * itemsPerPage;
 
   const endIndex = startIndex + itemsPerPage;
 
-  const paginatedData = filteredData.slice(
-    startIndex,
-    endIndex
-  );
+  const paginatedData = filteredData.slice(startIndex, endIndex);
 
   console.log("FILTERED DATA:", filteredData);
 
   return (
-    <section className="px-10 py-16">
-      <div className="flex gap-8">
+    <section className="px-4 py-10 sm:px-6 lg:px-10 lg:py-16">
+  <div className=" items-center flex flex-col gap-8 lg:flex-row">
+    <FilterSide
+      selectedPropertyType={selectedPropertyType}
+      setSelectedPropertyType={setSelectedPropertyType}
+      selectedAmenities={selectedAmenities}
+      setSelectedAmenities={setSelectedAmenities}
+      minPrice={minPrice}
+      maxPrice={maxPrice}
+      setMinPrice={setMinPrice}
+      setMaxPrice={setMaxPrice}
+      location={location}
+      setLocation={setLocation}
+    />
 
-        {/* SIDEBAR */}
-        <FilterSide
-          selectedPropertyType={
-            selectedPropertyType
-          }
-          setSelectedPropertyType={
-            setSelectedPropertyType
-          }
-          selectedAmenities={
-            selectedAmenities
-          }
-          setSelectedAmenities={
-            setSelectedAmenities
-          }
-          minPrice={minPrice}
-          maxPrice={maxPrice}
-          setMinPrice={setMinPrice}
-          setMaxPrice={setMaxPrice}
-          location={location}
-          setLocation={setLocation}
-        />
+    <div className="w-full flex-1">
+      <div className="mb-8 flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
+        <div>
+          <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl lg:text-6xl">
+            Available Oasis
+          </h1>
 
-        {/* RIGHT SIDE */}
-        <div className="flex-1">
+          <p className="mt-2 text-base text-gray-500 sm:text-lg">
+            Discover {filteredData.length} curated living spaces.
+          </p>
+        </div>
 
-          {/* HEADER */}
-          <div className="flex justify-between items-center mb-8">
+        <div className="flex w-full gap-2 rounded-full bg-green-600 p-2 sm:w-fit">
+          <button
+            onClick={() => setView("grid")}
+            className={`flex-1 rounded-full px-6 py-3 text-sm sm:flex-none sm:px-8 ${
+              view === "grid"
+                ? "bg-white font-medium text-black"
+                : "text-white"
+            }`}
+          >
+            Grid
+          </button>
 
-            <div>
-              <h1 className="text-6xl font-bold text-gray-900">
-                Available Oasis
-              </h1>
-
-              <p className="text-gray-500 text-lg mt-2">
-                Discover {filteredData.length} curated
-                living spaces.
-              </p>
-            </div>
-
-            {/* VIEW TOGGLE */}
-            <div className="bg-green-600 rounded-full p-2 flex gap-3">
-
-              <button
-                onClick={() =>
-                  setView("grid")
-                }
-                className={`px-8 py-3 rounded-full ${
-                  view === "grid"
-                    ? "bg-white text-black font-medium"
-                    : "text-white"
-                }`}
-              >
-                Grid
-              </button>
-
-              <button
-                onClick={() =>
-                  setView("map")
-                }
-                className={`px-8 py-3 rounded-full ${
-                  view === "map"
-                    ? "bg-white text-black font-medium"
-                    : "text-white"
-                }`}
-              >
-                Map View
-              </button>
-            </div>
-          </div>
-
-          {/* CONTENT */}
-          {view === "grid" ? (
-            <>
-              <div className="grid grid-cols-3 gap-4">
-                {paginatedData.map((item) => (
-                  <div key={item.id}>
-                    <ContentCard item={item} />
-                  </div>
-                ))}
-              </div>
-
-              {/* PAGINATION */}
-              {totalPages > 1 && (
-                <div className="flex justify-center items-center gap-3 mt-10">
-
-                  {/* PREV */}
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) =>
-                        Math.max(prev - 1, 1)
-                      )
-                    }
-                    disabled={currentPage === 1}
-                    className="px-4 py-2 rounded-xl border border-gray-300 disabled:opacity-50"
-                  >
-                    Prev
-                  </button>
-
-                  {/* PAGE NUMBERS */}
-                  {[...Array(totalPages)].map(
-                    (_, index) => {
-                      const page = index + 1;
-
-                      return (
-                        <button
-                          key={page}
-                          onClick={() =>
-                            setCurrentPage(page)
-                          }
-                          className={`w-10 h-10 rounded-xl ${
-                            currentPage === page
-                              ? "bg-green-600 text-white"
-                              : "border border-gray-300"
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      );
-                    }
-                  )}
-
-                  {/* NEXT */}
-                  <button
-                    onClick={() =>
-                      setCurrentPage((prev) =>
-                        Math.min(
-                          prev + 1,
-                          totalPages
-                        )
-                      )
-                    }
-                    disabled={
-                      currentPage === totalPages
-                    }
-                    className="px-4 py-2 rounded-xl border border-gray-300 disabled:opacity-50"
-                  >
-                    Next
-                  </button>
-                </div>
-              )}
-            </>
-          ) : (
-            <MapView data={filteredData} />
-          )}
+          <button
+            onClick={() => setView("map")}
+            className={`flex-1 rounded-full px-6 py-3 text-sm sm:flex-none sm:px-8 ${
+              view === "map"
+                ? "bg-white font-medium text-black"
+                : "text-white"
+            }`}
+          >
+            Map View
+          </button>
         </div>
       </div>
-    </section>
+
+      {view === "grid" ? (
+        <>
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 xl:grid-cols-3">
+            {paginatedData.map((item) => (
+              <ContentCard key={item.id} item={item} />
+            ))}
+          </div>
+
+          {totalPages > 1 && (
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) => Math.max(prev - 1, 1))
+                }
+                disabled={currentPage === 1}
+                className="rounded-xl border border-gray-300 px-4 py-2 disabled:opacity-50"
+              >
+                Prev
+              </button>
+
+              {[...Array(totalPages)].map((_, index) => {
+                const page = index + 1;
+
+                return (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`h-10 w-10 rounded-xl ${
+                      currentPage === page
+                        ? "bg-green-600 text-white"
+                        : "border border-gray-300"
+                    }`}
+                  >
+                    {page}
+                  </button>
+                );
+              })}
+
+              <button
+                onClick={() =>
+                  setCurrentPage((prev) =>
+                    Math.min(prev + 1, totalPages)
+                  )
+                }
+                disabled={currentPage === totalPages}
+                className="rounded-xl border border-gray-300 px-4 py-2 disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="overflow-hidden rounded-3xl">
+          <MapView data={filteredData} />
+        </div>
+      )}
+    </div>
+  </div>
+</section>
   );
 }

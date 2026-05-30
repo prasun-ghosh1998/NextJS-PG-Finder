@@ -133,7 +133,7 @@ export default function PropertyCard({
     <>
       <div
         onClick={() => setPropertyOpen(true)}
-        className="bg-[#F5F6FB] rounded-3xl shadow-md overflow-hidden hover:shadow-xl transition"
+        className="bg-[#F5F6FB] cursor-pointer rounded-3xl shadow-md overflow-hidden hover:shadow-xl transition"
       >
         <div className="relative h-[200px]">
           <Image

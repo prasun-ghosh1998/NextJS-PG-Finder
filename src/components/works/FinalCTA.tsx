@@ -7,7 +7,9 @@ export function FinalCTA (){
      <section className=" mx-6 my-20">
   <div className="bg-[#58e2ae] rounded-[30px] py-5 px-10 md:px-8  flex flex-col md:flex-row items-center justify-between gap-10">
     
-    <div className="flex-1">
+    <div data-aos="fade-right"
+          data-aos-duration="1200"
+          data-aos-delay="200" className="flex-1">
       <h2 className="text-green-900 text-4xl md:text-5xl font-bold leading-tight mb-5">
         Ready to find your urban oasis?
       </h2>
@@ -22,7 +24,9 @@ export function FinalCTA (){
       </button>
     </div>
 
-    <div className="flex-1  flex justify-center">
+    <div data-aos="fade-up"
+          data-aos-duration="1200"
+          data-aos-delay="200" className="flex-1  flex justify-center">
       <Image
         src={Img}
         alt="Urban Oasis"

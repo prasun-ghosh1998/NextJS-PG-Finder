@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import IMG from "@/assets/images/works/img.png"
+import IMG from "@/assets/images/works/img.png";
 export function HowItWorks() {
   const steps = [
     {
@@ -35,7 +35,10 @@ export function HowItWorks() {
 
       <div className="flex justify-between items-end mb-10 gap-4 flex-wrap">
         <h2 className="text-[#2C2F31] text-5xl font-bold leading-tight">
-          Find your next sanctuary.
+          Find your next{" "}
+          <span className="bg-gradient-to-r from-green-700 to-emerald-400 bg-clip-text text-transparent">
+            sanctuary.
+          </span>
         </h2>
         <p className="text-gray-400">
           Four simple steps to move from scrolling to moving in.
@@ -55,14 +58,22 @@ export function HowItWorks() {
             }`}
           >
             <div>
-              <div className="w-10 h-10 rounded-full bg-[#0a6a4f] text-white flex items-center justify-center text-sm font-semibold mb-6">
+              <div className={`w-10 h-10 rounded-full   flex items-center justify-center text-sm font-semibold mb-6 ${
+                  item.id === "04" ? "bg-white text-black" : "bg-[#0a6a4f] text-white"
+                }`}>
                 {item.id}
               </div>
 
-              <h3  className={`text-3xl font-semibold mb-4 ${
-    item.id === "04" ? "text-white" : "text-black"
-  }`}>{item.title}</h3>
-              <p className={`text-black text-base leading-7 opacity-80 max-w-md ${item.id === "04" ? "text-white" : "text-black"}`}>
+              <h3
+                className={`text-3xl font-semibold mb-4 ${
+                  item.id === "04" ? "text-white" : "text-black"
+                }`}
+              >
+                {item.title}
+              </h3>
+              <p
+                className={`text-black text-base leading-7 opacity-80 max-w-md ${item.id === "04" ? "text-white" : "text-black"}`}
+              >
                 {item.desc}
               </p>
               {item.img && (
